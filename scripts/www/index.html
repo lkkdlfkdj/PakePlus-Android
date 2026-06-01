@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>考勤管理系统</title>
+    <link rel="stylesheet" href="styles.css" id="theme-stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>考勤管理</h1>
+            <span class="app-version">v1.1.0</span>
+        </header>
+        
+        <nav class="tab-nav">
+            <button class="tab-button active" onclick="showTab(event, 'overtime')">
+                <span class="tab-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </span>
+                <span class="tab-text">加班</span>
+            </button>
+            <button class="tab-button" onclick="showTab(event, 'compensatory')">
+                <span class="tab-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                </span>
+                <span class="tab-text">补休</span>
+            </button>
+            <button class="tab-button" onclick="showTab(event, 'leave')">
+                <span class="tab-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 17l-3 4"/><path d="M9 13l3-2 2 3"/><circle cx="12" cy="6" r="2"/><path d="M12 10l-2 4 3 3"/>
+                    </svg>
+                </span>
+                <span class="tab-text">请假</span>
+            </button>
+            <button class="tab-button" onclick="showTab(event, 'history')">
+                <span class="tab-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                </span>
+                <span class="tab-text">历史</span>
+            </button>
+            <button class="tab-button" onclick="showTab(event, 'export')">
+                <span class="tab-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                </span>
+                <span class="tab-text">导出</span>
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <!-- 加班标签页 -->
+            <div id="overtime" class="tab-content active">
+                <div class="card">
+                    <form id="overtimeForm" class="mobile-form">
+                        <div class="form-group">
+                            <label for="overtimeDate">加班日期</label>
+                            <input type="date" id="overtimeDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="overtimeTimeSlot">时间段</label>
+                            <select id="overtimeTimeSlot" required>
+                                <option value="">请选择时间段</option>
+                                <option value="morning">上午8:00-12:00</option>
+                                <option value="afternoon">下午14:00-18:00</option>
+                                <option value="evening">晚上19:00-23:00</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="customOvertimeTimeSlot" style="display: none;">
+                            <label for="customOvertimeTimeText">自定义时间段</label>
+                            <input type="text" id="customOvertimeTimeText" placeholder="请输入自定义时间段，如：09:00-17:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="overtimeReason">加班原因</label>
+                            <select id="overtimeReason" required>
+                                <option value="">请选择加班原因</option>
+                                <option value="saturday">周六加班</option>
+                                <option value="weekend">周末加班</option>
+                                <option value="city">创城加班</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="customOvertimeReason" style="display: none;">
+                            <label for="customOvertimeText">自定义原因</label>
+                            <input type="text" id="customOvertimeText" placeholder="请输入自定义原因">
+                        </div>
+                        <button type="submit" class="submit-btn">提交加班申请</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 补休标签页 -->
+            <div id="compensatory" class="tab-content">
+                <div class="card">
+                    <form id="compensatoryForm" class="mobile-form">
+                        <div class="form-group">
+                            <label for="compensatoryDate">补休日期</label>
+                            <input type="date" id="compensatoryDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shiftSchedule">班次</label>
+                            <div class="input-with-lock">
+                                <select id="shiftSchedule" required>
+                                    <option value="">请选择班次</option>
+                                    <option value="A14">A14</option>
+                                    <option value="A16">A16</option>
+                                    <option value="A17">A17</option>
+                                    <option value="A18">A18</option>
+                                    <option value="A19">A19</option>
+                                    <option value="A2">A2</option>
+                                    <option value="A20">A20</option>
+                                    <option value="A21">A21</option>
+                                    <option value="A22">A22</option>
+                                    <option value="A23">A23</option>
+                                    <option value="A27">A27</option>
+                                    <option value="A30">A30</option>
+                                    <option value="A31">A31</option>
+                                    <option value="A32">A32</option>
+                                    <option value="A35">A35</option>
+                                    <option value="A37">A37</option>
+                                    <option value="A39">A39</option>
+                                    <option value="A40">A40</option>
+                                    <option value="A46">A46</option>
+                                    <option value="A47">A47</option>
+                                    <option value="A48">A48</option>
+                                    <option value="A49">A49</option>
+                                    <option value="A50">A50</option>
+                                    <option value="A51">A51</option>
+                                    <option value="A52">A52</option>
+                                    <option value="A53">A53</option>
+                                    <option value="A54">A54</option>
+                                    <option value="A55">A55</option>
+                                    <option value="A56">A56</option>
+                                    <option value="A57">A57</option>
+                                    <option value="A58">A58</option>
+                                    <option value="A59">A59</option>
+                                    <option value="A65">A65</option>
+                                    <option value="A66">A66</option>
+                                    <option value="A69">A69</option>
+                                    <option value="A7">A7</option>
+                                    <option value="A71">A71</option>
+                                    <option value="A74">A74</option>
+                                    <option value="A8">A8</option>
+                                </select>
+                                <button type="button" id="shiftModifyBtn" onclick="toggleShiftLock()" class="lock-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                                    </svg>
+                                </button>
+                                <button type="button" id="shiftFixBtn" onclick="toggleShiftLock()" class="lock-btn fixed" style="display: none;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="compensatoryTimeSlot">时间段</label>
+                            <div id="shiftTimeDisplay" class="shift-time-display" style="display: none;">
+                                <div class="time-info">请先选择班次</div>
+                            </div>
+                            <select id="compensatoryTimeSlot" required>
+                                <option value="">请选择时间段</option>
+                                <option value="morning">上午7:00-11:00</option>
+                                <option value="afternoon">下午14:30-17:30</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>锁定控制</label>
+                            <div class="lock-control-buttons">
+                                <button type="button" onclick="unlockAll()" class="unlock-all-btn">取消所有锁定</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="relatedOvertime">关联加班记录</label>
+                            <select id="relatedOvertime" required>
+                                <option value="">请选择关联的加班记录</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn">提交补休申请</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 请假标签页 -->
+            <div id="leave" class="tab-content">
+                <div class="card">
+                    <form id="leaveForm" class="mobile-form">
+                        <div class="form-group">
+                            <label for="leaveDate">请假日期</label>
+                            <input type="date" id="leaveDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="leaveTimeSlot">时间段</label>
+                            <select id="leaveTimeSlot" required>
+                                <option value="">请选择时间段</option>
+                                <option value="morning">上午7:00-11:00</option>
+                                <option value="afternoon">下午14:30-17:30</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="customLeaveTimeSlot" style="display: none;">
+                            <label for="customLeaveTimeText">自定义时间段</label>
+                            <input type="text" id="customLeaveTimeText" placeholder="请输入自定义时间段，如：09:00-15:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="leaveReason">请假原因</label>
+                            <select id="leaveReason" required>
+                                <option value="">请选择请假原因</option>
+                                <option value="personal">事假</option>
+                                <option value="sick">病假</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="customLeaveReason" style="display: none;">
+                            <label for="customLeaveText">自定义原因</label>
+                            <input type="text" id="customLeaveText" placeholder="请输入自定义原因">
+                        </div>
+                        <button type="submit" class="submit-btn">提交请假申请</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 历史视图标签页 -->
+            <div id="history" class="tab-content">
+                <div class="card">
+                    <div class="statistics-mobile">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalOvertime">0</div>
+                            <div class="stat-label">加班总次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalCompensatory">0</div>
+                            <div class="stat-label">补休总次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="remainingCount">0</div>
+                            <div class="stat-label">剩余次数</div>
+                        </div>
+                    </div>
+                    
+                    <div id="expirationWarning" class="warning-mobile" style="display: none;"></div>
+                    
+                    <!-- 万年历 -->
+                    <div class="calendar-mobile">
+                        <div class="calendar-header-mobile">
+                            <button id="prevMonth" class="calendar-nav-mobile">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="15 18 9 12 15 6"/>
+                                </svg>
+                            </button>
+                            <span id="currentMonth" class="calendar-title-mobile"></span>
+                            <button id="nextMonth" class="calendar-nav-mobile">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="calendar-legend-mobile">
+                            <span class="legend-item-mobile"><span class="legend-dot overtime-color"></span>加班</span>
+                            <span class="legend-item-mobile"><span class="legend-dot compensatory-color"></span>补休</span>
+                            <span class="legend-item-mobile"><span class="legend-dot leave-color"></span>请假</span>
+                            <span class="legend-item-mobile"><span class="legend-dot full-compensatory-color"></span>全补</span>
+                        </div>
+                        <div id="calendar" class="calendar-grid-mobile"></div>
+                    </div>
+                    
+                    <div class="history-list-mobile" id="historyList"></div>
+                </div>
+            </div>
+
+            <!-- 导出标签页 -->
+            <div id="export" class="tab-content">
+                <div class="card">
+                    <div class="export-section">
+                        <h3>筛选条件</h3>
+                        <div class="export-filters-mobile">
+                            <div class="form-group">
+                                <label for="exportYear">年份</label>
+                                <select id="exportYear">
+                                    <option value="">全部年份</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exportMonth">月份</label>
+                                <select id="exportMonth">
+                                    <option value="">全部月份</option>
+                                    <option value="01">1月</option>
+                                    <option value="02">2月</option>
+                                    <option value="03">3月</option>
+                                    <option value="04">4月</option>
+                                    <option value="05">5月</option>
+                                    <option value="06">6月</option>
+                                    <option value="07">7月</option>
+                                    <option value="08">8月</option>
+                                    <option value="09">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11">11月</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exportType">导出类型</label>
+                                <select id="exportType" onchange="updateFieldOptions()">
+                                    <option value="overtime">加班记录</option>
+                                    <option value="compensatory">补休记录</option>
+                                    <option value="leave">请假记录</option>
+                                    <option value="all">全部记录</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 字段选择区域 -->
+                    <div class="field-selection-mobile">
+                        <h3>选择字段</h3>
+                        <div class="field-templates-mobile">
+                            <button type="button" onclick="selectAllFields()" class="template-btn-mobile">全选</button>
+                            <button type="button" onclick="clearAllFields()" class="template-btn-mobile">清空</button>
+                            <button type="button" onclick="loadTemplate('basic')" class="template-btn-mobile">基础</button>
+                            <button type="button" onclick="loadTemplate('detailed')" class="template-btn-mobile">详细</button>
+                        </div>
+                        
+                        <!-- 字段选择组 -->
+                        <div id="overtimeFields" class="field-group-mobile">
+                            <div class="field-checkboxes-mobile">
+                                <label class="checkbox-mobile"><input type="checkbox" value="加班日期" checked><span>加班日期</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="时间段" checked><span>时间段</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="加班原因" checked><span>加班原因</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="状态" checked><span>状态</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="创建时间"><span>创建时间</span></label>
+                            </div>
+                        </div>
+                        
+                        <div id="compensatoryFields" class="field-group-mobile" style="display: none;">
+                            <div class="field-checkboxes-mobile">
+                                <label class="checkbox-mobile"><input type="checkbox" value="补休日期" checked><span>补休日期</span></label>
+
+                                <label class="checkbox-mobile"><input type="checkbox" value="班次" checked><span>班次</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="班次时间"><span>班次时间</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="时间段" checked><span>时间段</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="关联加班日期" checked><span>关联加班日期</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="关联加班时间段" checked><span>关联加班时间段</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="加班原因" checked><span>加班原因</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="创建时间"><span>创建时间</span></label>
+                            </div>
+                        </div>
+                        
+                        <div id="leaveFields" class="field-group-mobile" style="display: none;">
+                            <div class="field-checkboxes-mobile">
+                                <label class="checkbox-mobile"><input type="checkbox" value="请假日期" checked><span>请假日期</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="时间段" checked><span>时间段</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="请假原因" checked><span>请假原因</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="创建时间"><span>创建时间</span></label>
+                            </div>
+                        </div>
+                        
+                        <div id="allFields" class="field-group-mobile" style="display: none;">
+                            <div class="field-checkboxes-mobile">
+                                <label class="checkbox-mobile"><input type="checkbox" value="类型" checked><span>类型</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="日期" checked><span>日期</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="时间段" checked><span>时间段</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="详细信息" checked><span>详细信息</span></label>
+
+                                <label class="checkbox-mobile"><input type="checkbox" value="班次"><span>班次</span></label>
+                                <label class="checkbox-mobile"><input type="checkbox" value="创建时间"><span>创建时间</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="export-actions-mobile">
+                        <button onclick="showExportPreview()" class="preview-btn-mobile">显示结果</button>
+                        <button onclick="exportFilteredData()" class="export-btn-mobile">导出数据</button>
+                    </div>
+                    
+                    <div class="export-result-mobile">
+                        <label>导出结果</label>
+                        <div class="export-table-wrapper" id="exportTableWrapper">
+                            <table class="export-table" id="exportTable">
+                                <thead><tr id="exportTableHead"></tr></thead>
+                                <tbody id="exportTableBody"></tbody>
+                            </table>
+                            <div class="export-table-empty" id="exportTableEmpty">点击「显示结果」或「导出数据」按钮后，内容将显示在这里</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 数据备份与恢复 -->
+                    <div class="export-section data-management">
+                        <h3>数据管理</h3>
+                        <div class="data-mgmt-actions">
+                            <button onclick="backupData()" class="data-btn backup-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                备份数据
+                            </button>
+                            <button onclick="document.getElementById('restoreInput').click()" class="data-btn restore-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                恢复数据
+                            </button>
+                        </div>
+                        <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
+                        <p class="data-mgmt-hint">更新前先备份，更新后再恢复，数据不会丢失</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 事件详情弹窗 -->
+        <div id="eventModal" class="modal-mobile" style="display: none;">
+            <div class="modal-content-mobile">
+                <div class="modal-header-mobile">
+                    <h3 id="modalTitle">事件详情</h3>
+                    <button class="close-mobile" onclick="closeEventModal()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body-mobile" id="modalBody">
+                    <!-- 事件详情内容 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="switch-theme.js"></script>
+</body>
+</html>
